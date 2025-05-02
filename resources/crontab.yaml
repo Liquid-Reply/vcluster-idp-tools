@@ -1,4 +1,4 @@
-# from https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#create-custom-objects
+# source: https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#create-custom-objects
 apiVersion: "stable.example.com/v1"
 kind: CronTab
 metadata:
