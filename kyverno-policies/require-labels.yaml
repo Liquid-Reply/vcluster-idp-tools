@@ -24,6 +24,7 @@ spec:
           kinds:
           - Pod
     validate:
+      failureAction: Audit
       message: "The label `app.kubernetes.io/name` is required."
       pattern:
         metadata:
