@@ -1,0 +1,51 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-labels-annotations-resources
+spec:
+  rules:
+    - name: add-labels-annotations
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              names:
+                - "nginx-mutate-*"
+              namespaces:
+                - tenant-a
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              +(foo): "bar"
+            labels:
+              +(foo): "bar"
+    - name: add-default-requests # source: https://kyverno.io/policies/other/add-default-resources/add-default-resources/
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              names:
+                - "nginx-mutate-*"
+              namespaces:
+                - tenant-a
+      preconditions:
+        any:
+          - key: "{{request.operation || 'BACKGROUND'}}"
+            operator: AnyIn
+            value:
+              - CREATE
+              - UPDATE
+      mutate:
+        foreach:
+          - list: "request.object.spec.[ephemeralContainers, initContainers, containers][]"
+            patchStrategicMerge:
+              spec:
+                containers:
+                  - (name): "{{element.name}}"
+                    resources:
+                      requests:
+                        +(memory): "100Mi"
+                        +(cpu): "100m"
